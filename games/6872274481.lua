@@ -603,18 +603,28 @@ run(function()
 	end
 
 	entitylib.getUpdateConnections = function(ent)
-		local char = ent.Character
-		local tab = {
-			char:GetAttributeChangedSignal('Health'),
-			char:GetAttributeChangedSignal('MaxHealth'),
-			{
-				Connect = function()
-					ent.Friend = ent.Player and isFriend(ent.Player) or nil
-					ent.Target = ent.Player and isTarget(ent.Player) or nil
-					return {Disconnect = function() end}
-				end
-			}
-		}
+    local char = ent and ent.Character
+    if not char then
+        return {}
+    end
+
+    local tab = {
+        char:GetAttributeChangedSignal("Health"),
+        char:GetAttributeChangedSignal("MaxHealth"),
+        {
+            Connect = function()
+                ent.Friend = ent.Player and isFriend(ent.Player) or nil
+                ent.Target = ent.Player and isTarget(ent.Player) or nil
+
+                return {
+                    Disconnect = function() end
+                }
+            end
+        }
+    }
+
+    return tab
+end
 
 		if ent.Player then
 			table.insert(tab, ent.Player:GetAttributeChangedSignal('PlayingAsKit'))
